@@ -70,7 +70,6 @@ u <- shinyUI(pageWithSidebar(
     h5(strong('Input Formatting: ')),
     p("To input multiple values, use commas to separate them (e.g., 1, 2, 3, 4). Ensure that each cell contains an equal number of inputs. Note that the SiGN model is temporally relative, meaning it allows initial and terminal link durations to be treated as any unit of time (e.g., seconds, minutes, hours, etc.). However, it is crucial that, whatever units are used, they are consistent across all link durations."),
     p("The calculator assumes that terminal links are distinct stimuli (e.g., A1 and A2 differ in colour). If the terminal stimuli are not distinct (e.g., identical in colour), the associated delays and probabilities must be entered as weighted averages to avoid erroneously treating the choice alternative as signalled. For further clarification, please contact the authors of Dunn et al. (2024)."),
-    
     h5(strong('Initial Link Scheduling: ')),
        p('Setting the initial link schedules as ',
        em('FR'),
