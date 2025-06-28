@@ -69,7 +69,7 @@ u <- shinyUI(pageWithSidebar(
     
     h5(strong('Input Formatting: ')),
     p("To input multiple values, use commas to separate them (e.g., 1, 2, 3, 4). Ensure that each cell contains an equal number of inputs. Note that the SiGN model is temporally relative, meaning it allows initial and terminal link durations to be treated as any unit of time (e.g., seconds, minutes, hours, etc.). However, it is crucial that, whatever units are used, they are consistent across all link durations."),
-    p("The calculator assumes that terminal links are distinct stimuli (e.g., A1 and A2 differ in colour). If the terminal stimuli are not distinct (e.g., identical in colour), the associated delays and probabilities must be entered as weighted averages to avoid erroneously treating the choice alternative as signalled. For further clarification, please contact the authors of Dunn et al. (2024)."),
+    p("The calculation being performed assumes that the signalling function of terminal link stimuli remains fixed across the entire duration of the terminal link—that is, the probability of terminal reinforcement does not change partway through the terminal link. Procedures that depart from this assumption may not be appropriately handled by the calculator."),
     h5(strong('Initial Link Scheduling: ')),
        p('Setting the initial link schedules as ',
        em('FR'),
@@ -114,10 +114,11 @@ u <- shinyUI(pageWithSidebar(
     
     h5(strong('BibTeX entry for LaTeX users:')),
     
-    h5(code('@Manual{,'), br(),
+    h5(code('@online{,'), br(),
     code('title = {{SiGN} Model Prediction Calculator},'), br(),
     code('author = {Pisklak, J. M.},'), br(),
-    code('date = {2024-02},'), br(),
+    code('year = {2024},'), br(),
+    code('month = {feb},'), br(),
     code('note = {version 1.0},'), br(),
     code('url = {https://jpisklak.shinyapps.io/SiGN_Calc/}'), br(),
     code('}')
