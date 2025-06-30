@@ -1,13 +1,11 @@
-# SiGN_Calc
-Welcome to the GitHub repository for the *SiGN Model Prediction Calculator*.
+# SiGN Model Calculator
+An interactive tool for predicting choice in concurrent chained schedules of reinforcement using the SiGN (Signals for Good News) model.
 
 ## Overview
-The calculator is a tool designed to facilitate choice predictions for concurrent chained schedules of reinforcement using the SiGN (Signals for Good News) model. This repository contains the source code for the calculator.
+This repository contains the source code for a web-based calculator that implements the SiGN (Signals for Good News) model of choice behaviour. The calculator is designed to aid researchers and students in generating predictions for concurrent chained schedules of reinforcement.
 
 ## Usage
-To use the calculator, simply visit:
-
-[https://jpisklak.shinyapps.io/SiGN_Calc/](https://jpisklak.shinyapps.io/SiGN_Calc/). No installation is required, and you can start making predictions right away.
+The app is hosted on [shinyapps.io](https://www.shinyapps.io/) and can be accessed here: [https://jpisklak.shinyapps.io/SiGN_Calc/](https://jpisklak.shinyapps.io/SiGN_Calc/)
 
 ## License
-This project is licensed under the [GNU GENERAL PUBLIC LICENSE](LICENSE).
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0). See the [GNU GENERAL PUBLIC LICENSE](LICENSE) file for details.
