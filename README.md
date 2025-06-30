@@ -1,4 +1,4 @@
-# SiGN Model Calculator
+# SiGN Model Prediction Calculator
 An interactive tool for predicting choice in concurrent chained schedules of reinforcement using the SiGN (Signals for Good News) model.
 
 ## Overview
