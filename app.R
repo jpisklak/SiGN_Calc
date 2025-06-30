@@ -104,9 +104,9 @@ u <- shinyUI(pageWithSidebar(
     
     h4(strong('To reference this page, please use:')),
     
-    h5('Pisklak, J. M. (2024).',
+    h5('Pisklak, J. M. (2025).',
        em('SiGN Model Prediction Calculator '), 
-       '[version 1.0]. ', 
+       '[v1.0.0]. ', 
        HTML("<a href='https://jpisklak.shinyapps.io/SiGN_Calc/'>https://jpisklak.shinyapps.io/SiGN_Calc/</a>")
     ),
     
@@ -114,12 +114,11 @@ u <- shinyUI(pageWithSidebar(
     
     h5(strong('BibTeX entry for LaTeX users:')),
     
-    h5(code('@online{,'), br(),
+    h5(code('@misc{,'), br(),
     code('title = {{SiGN} Model Prediction Calculator},'), br(),
-    code('author = {Pisklak, J. M.},'), br(),
-    code('year = {2024},'), br(),
-    code('month = {feb},'), br(),
-    code('note = {version 1.0},'), br(),
+    code('author = {Pisklak, Jeffrey M.},'), br(),
+    code('year = {2025},'), br(),
+    code('note = {v1.0.0},'), br(),
     code('url = {https://jpisklak.shinyapps.io/SiGN_Calc/}'), br(),
     code('}')
   ),
