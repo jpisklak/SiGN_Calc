@@ -69,6 +69,7 @@ u <- shinyUI(pageWithSidebar(
     
     h5(strong('Input Formatting: ')),
     p("To input multiple values, use commas to separate them (e.g., 1, 2, 3, 4). Ensure that each cell contains an equal number of inputs. Note that the SiGN model is temporally relative, meaning it allows initial and terminal link durations to be treated as any unit of time (e.g., seconds, minutes, hours, etc.). However, it is crucial that, whatever units are used, they are consistent across all link durations."),
+    p("The current version of the calculator (v1.0) requires all terminal link durations to be greater than zero. This is a limitation of the calculator’s implementation, not of the SiGN model itself. When all terminal link durations are set to zero, the SiGN model simplifies to standard matching."),
     p("The calculation being performed assumes that the signalling function of terminal link stimuli remains fixed across the entire duration of the terminal link—that is, the probability of terminal reinforcement does not change partway through the terminal link. Procedures that depart from this assumption may not be appropriately handled by the calculator."),
     h5(strong('Initial Link Scheduling: ')),
        p('Setting the initial link schedules as ',
