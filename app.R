@@ -1,246 +1,234 @@
-library(shiny)
-source('SiGN Function.R')
-
-sigDigs = 4
-
-#Put in caveat about greater than 0
-#Trip error if entry probs are uneven or there are uneven vectors?
-
-u <- shinyUI(pageWithSidebar(
-  
-  headerPanel("SiGN Model Prediction Calculator (v1.0)"),
-  sidebarPanel(
-    
-    #Initial Link Durations
-    h4('Initial Link Durations'),
-    textInput('ILa_dur', 'A', "1"),
-    textInput('ILb_dur', 'B', "1"),
-    br(),
-    
-    #Initial Link Schedules
-    h4('Initial Link Schedules'),
-    textInput('Sched_IL_a', 'A (FR or VI only)', "FR"),
-    textInput('Sched_IL_b', 'B (FR or VI only)', "FR"),
-    br(),
-
-    #Terminal Link Durations
-    h4('Terminal Link Durations'),
-    textInput('TLa1_dur', 'A1', "10"),
-    textInput('TLa2_dur', 'A2', "10"),
-    
-    textInput('TLb1_dur', 'B1', "10"),
-    textInput('TLb2_dur', 'B2', "10"),
-    br(),
-    
-    #Entry Probabilities
-    h4('Terminal Link Entry Probabilities'),
-    textInput('TLa1_p', 'A1', "0.2"),
-    textInput('TLa2_p', 'A2', "0.8"),
-    
-    textInput('TLb1_p', 'B1', "0.2"),
-    textInput('TLb2_p', 'B2', "0.8"),
-    br(),
-    
-    #Terminal/Primary Reinforcement Probabilities
-    h4('Terminal (i.e., Primary) Reinforcement Probabilities'),
-    textInput('TLa1_rp', 
-              'A1', 
-              "1"),
-    textInput('TLa2_rp', 
-              'A2', 
-              "0"),
-    
-    textInput('TLb1_rp', 
-              'B1', 
-              "0.5"),
-    textInput('TLb2_rp', 
-              'B2', 
-              "0.5")
- 
-  ),
-  
-  mainPanel(
-    h3('Calculated Values'),
-    verbatimTextOutput("out_1"),
-    br(),
-    h4(strong("Notes:")),
-    h5(strong('Calculator Version 1.0')),
-    p('This calculator presently uses a implementation of the SiGN model based on early R code. A more robust and flexible R package is currently under development, which will include improved error checking, support for additional procedures, and enhanced functionality. Users seeking more advanced features or wishing to incorporate the model into their own analyses are encouraged to use the package when it becomes available. This page will be updated as improvements to the model and package are released.'),
-    h5(strong('Output Precision: ')), 
-    p('The output displays values rounded to 4 decimal places, although calculations are performed with much higher levels of precision.'),
-      h5(strong('Input Formatting: ')),
-    p("To input multiple values, use commas to separate them (e.g., 1, 2, 3, 4). Ensure that each cell contains an equal number of inputs. Note that the SiGN model is temporally relative, meaning it allows initial and terminal link durations to be treated as any unit of time (e.g., seconds, minutes, hours, etc.). However, it is crucial that, whatever units are used, they are consistent across all link durations."),
-    p("The calculation being performed assumes that the signalling function of terminal link stimuli remains fixed across the entire duration of the terminal link—that is, the probability of terminal reinforcement does not change partway through the terminal link. Procedures that depart from this assumption may not be appropriately handled by the calculator."),
-    h5(strong('Initial Link Scheduling: ')),
-       p('Setting the initial link schedules as ',
-       em('FR'),
-       'is most suitable for cases involving an FR 1 schedule or when a single timer is employed in the initial links of long VI schedules. This is because the ',
-       em('FR'),
-       ' setting does not take into account the switching behaviour present with concurrent schedules using independent timers. For example, if a single timer is used for two concurrent VI 30 schedules, setting the ',
-       em('Initial Link Schedule'),
-       ' as an ',
-       em('FR'),
-       ' is preferable because the time spent in the initial links is controlled by one timer, not two independent timers operating concurrently. However, if independent timers are used for each initial link, the calculator requires this setting to be ',
-       em('VI'),
-       '. Note that the SiGN model does not directly compute predictions for ratio schedules. Instead, it represents the ratio as a duration with an individual reinforcement rate, rather than a common/shared one.'),
-
-    h5(strong('Model Information: ')),
-       p('Additional details about the model can be found in Dunn et al. (2024)'),
-    
-    br(),
-    
-    img(src="diagram.svg", height="50%", width="50%"),
-    
-    br(),
-    
-    h4(strong('References:')),
-    
-    h5('Dunn, R. M., Pisklak, J. M., McDevitt, M. A., & Spetch, M. L. (2024).',
-       'Suboptimal choice: A review and quantification of the signal for good news (SiGN) model. ',
-       em('Psychological Review, 131'), '(1), 58-78.',
-       HTML("<a href='https://doi.org/10.1037/rev0000416'>https://doi.org/10.1037/rev0000416</a>")
-       ),
-    
-    br(),
-    
-    h4(strong('To reference this page, please use:')),
-    
-    h5('Pisklak, J. M. (2025).',
-       em('SiGN Model Prediction Calculator '), 
-       '[v1.0.0]. ', 
-       HTML("<a href='https://jpisklak.shinyapps.io/SiGN_Calc/'>https://jpisklak.shinyapps.io/SiGN_Calc/</a>")
-    ),
-    
-    br(),
-    
-    h5(strong('BibTeX entry for LaTeX users:')),
-    
-    h5(code('@misc{,'), br(),
-    code('title = {{SiGN} Model Prediction Calculator},'), br(),
-    code('author = {Pisklak, Jeffrey M.},'), br(),
-    code('year = {2025},'), br(),
-    code('note = {v1.0.0},'), br(),
-    code('url = {https://jpisklak.shinyapps.io/SiGN_Calc/}'), br(),
-    code('}')
-  ),
-  
-  br(), br()
-    
-  )
-))
-
-s <- shinyServer(function(input, output) {
-  
-  output$out_1 <- renderPrint({
-    #Initial Link Durations
-    ILa_dur <- as.numeric(unlist(strsplit(input$ILa_dur, ",")))
-    ILb_dur <- as.numeric(unlist(strsplit(input$ILb_dur, ",")))
-    
-    #Initial Link Schedules
-    Sched_IL_a <- toupper(gsub(" ", "", unlist(strsplit(input$Sched_IL_a, ","))))
-    Sched_IL_b <- toupper(gsub(" ", "", unlist(strsplit(input$Sched_IL_b, ","))))
-    
-    #Terminal Link Durations
-    TLa1_dur <- as.numeric(unlist(strsplit(input$TLa1_dur, ",")))
-    TLa2_dur <- as.numeric(unlist(strsplit(input$TLa2_dur, ",")))
-    
-    TLb1_dur <- as.numeric(unlist(strsplit(input$TLb1_dur, ",")))
-    TLb2_dur <- as.numeric(unlist(strsplit(input$TLb2_dur, ",")))
-    
-    #Entry Probabilities
-    TLa1_p <- as.numeric(unlist(strsplit(input$TLa1_p, ",")))
-    TLa2_p <- as.numeric(unlist(strsplit(input$TLa2_p, ",")))
-    
-    TLb1_p <- as.numeric(unlist(strsplit(input$TLb1_p, ",")))
-    TLb2_p <- as.numeric(unlist(strsplit(input$TLb2_p, ",")))
-    
-    #Terminal/Primary Reinforcement Probabilities
-    TLa1_rp <- as.numeric(unlist(strsplit(input$TLa1_rp, ",")))
-    TLa2_rp <- as.numeric(unlist(strsplit(input$TLa2_rp, ",")))
-    
-    TLb1_rp <- as.numeric(unlist(strsplit(input$TLb1_rp, ",")))
-    TLb2_rp <- as.numeric(unlist(strsplit(input$TLb2_rp, ",")))
-    
-    results <- SiGN(ILa_dur, ILb_dur,
-                    TLa1_dur, TLa2_dur,
-                    TLb1_dur, TLb2_dur,
-                    TLa1_p, TLa2_p,
-                    TLb1_p, TLb2_p,
-                    TLa1_rp, TLa2_rp,
-                    TLb1_rp, TLb2_rp,
-                    Sched_IL_a, Sched_IL_b,
-                    Sdelt_dur = 1,
-                    useBeta = TRUE)
-    
-    l <- list(ILa_dur, ILb_dur,
-              TLa1_dur, TLa2_dur,
-              TLb1_dur, TLb2_dur,
-              TLa1_p, TLa2_p,
-              TLb1_p, TLb2_p,
-              TLa1_rp, TLa2_rp,
-              TLb1_rp, TLb2_rp,
-              Sched_IL_a, Sched_IL_b)
-
-    flag = FALSE
-    
-    if (length(unique(sapply(l, length))) != 1 &
-        !anyNA(l, recursive = TRUE)) {
-      cat('WARNING:Input values are unequal lengths.\n',
-          '--------------------------------------------\n\n')
-      flag = TRUE
-    }
-    
-    if (sum(unlist(l[15:16]) %in% c('FR', 'VI')) != length(unlist(l[15:16]))) {
-      cat('WARNING: Only FR and VI are accepted inputs.\n',
-          '--------------------------------------------\n\n')
-      flag = TRUE
-    }
-    
-    if (sum((TLa1_p + TLa2_p)) + sum((TLb1_p + TLb2_p)) != length(c(TLa1_p, TLb1_p))) {
-      cat('WARNING: Entry probabilities must sum to 1 for each alternative.\n',
-          '--------------------------------------------\n\n')
-      flag = TRUE
-    }
-    
-    if (!all(Sched_IL_a == Sched_IL_b)) {
-      cat('WARNING: A and B must contain the same schedule types.\n',
-          '--------------------------------------------\n\n')
-      flag = TRUE
-    }
-    
-    if (flag == FALSE) {
-    cat('Predicted Choice Proportion for A: \n')
-    cat(round(results$SiGN_cp, sigDigs), sep = ', ')
-    
-    cat('\n\nBig T: \n', sep = ', ')
-    cat(round(results$BigT, sigDigs), sep = ', ')
-    
-    cat('\n\nConditional Reinforcement (δ) on A: \n', sep = ', ')
-    cat(round(results$CRa, sigDigs), sep = ', ')
-    
-    cat('\n\nConditional Reinforcement (δ) on B: \n', sep = ', ')
-    cat(round(results$CRb, sigDigs), sep = ', ')
-    
-    cat('\n\nRate of Terminal Reinforcement on A\n', sep = ', ')
-    cat(round(results$r_a, sigDigs), sep = ', ')
-    
-    cat('\n\nRate of Terminal Reinforcement on B\n', sep = ', ')
-    cat(round(results$r_b, sigDigs), sep = ', ')
-    
-    cat('\n\nRate of Terminal Reinforcement on A w/switching\n', sep = ', ')
-    cat(round(results$r_a_Com, sigDigs), sep = ', ')
-    
-    cat('\n\nRate of Terminal Reinforcement on B w/switching\n', sep = ', ')
-    cat(round(results$r_b_Com, sigDigs), sep = ', ')
-    
-    cat('\n\nAlternative A Signalled: ', results$A_Sig,
-        '\nAlternative B Signalled: ', results$B_Sig)
-    }
-
-  }
-  )
-
-  
+# Try loading SiGN package, install from GitHub if not already installed
+if (!requireNamespace("SiGN", quietly = TRUE)) {
+  remotes::install_github("jpisklak/SiGN")
 }
+library(SiGN)
+
+parse_numeric_input <- function(x) {
+  as.numeric(strsplit(toupper(x), ",\\s*")[[1]])
+}
+
+parse_character_input <- function(x) {
+  strsplit(x, ",\\s*")[[1]]
+}
+
+ui <- fluidPage(
+  titlePanel(
+    title = div(
+      img(
+        src = "hex_sticker.png",
+        width = "7%",
+        style = "margin-right: 15px;"
+      ),
+      "SiGN Model Prediction Calculator"
+    )
+  ),
+  sidebarLayout(
+    sidebarPanel(
+      h3("Initial Link Durations"),
+      textInput("il_dur_a", "A", "1"),
+      textInput("il_dur_b", "B", "1"),
+      h3("Initial Link Schedules"),
+      textInput("il_sched_a", "A", "FR"),
+      textInput("il_sched_b", "B", "FR"),
+      h4("Terminal Link Durations"),
+      textInput("tl_dur_a1", "A1", "10"),
+      textInput("tl_dur_a2", "A2", "10"),
+      textInput("tl_dur_b1", "B1", "10"),
+      textInput("tl_dur_b2", "B2", "10"),
+      h4("Terminal Link Entry Probabilities"),
+      textInput("tl_p_a1", "A1", "0.2"),
+      textInput("tl_p_a2", "A2", "0.8"),
+      textInput("tl_p_b1", "B1", "0.2"),
+      textInput("tl_p_b2", "B2", "0.8"),
+      h4("Terminal (i.e., Primary) Reinforcement Probabilities"),
+      textInput("tr_p_a1", "A1", "1"),
+      textInput("tr_p_a2", "A2", "0"),
+      textInput("tr_p_b1", "B1", "0.5"),
+      textInput("tr_p_b2", "B2", "0.5"),
+      sliderInput("round_digits",
+        "Decimal places to round output:",
+        min = 0, max = 6, value = 3
+      ),
+      # actionButton("run", "Run Model")
+    ),
+    mainPanel(
+      h3("Model Output:"),
+      h4("Predicted Choice Proportion for A"),
+      verbatimTextOutput("choice_prop"),
+      hr(),
+      h4("Rate of Terminal Reinforcement"),
+      verbatimTextOutput("rein_rate"),
+      hr(),
+      h4("Conditional Reinforcement (δ)"),
+      verbatimTextOutput("cond_rein"),
+      hr(),
+      h4("Additional Details"),
+      verbatimTextOutput("add_details"),
+      hr(),
+      h5("SiGN R Package Version"),
+      verbatimTextOutput("pkg_version"),
+      h4("Notes:"),
+      helpText(HTML("
+    <p><b>Input Formatting:</b>
+    <br>
+To input multiple values, use commas to separate them (e.g., 1, 2, 3, 4).
+    <br><br>
+Note that the SiGN model is temporally relative, meaning it allows initial and terminal link durations to be treated as any unit of time (e.g., seconds, minutes, hours, etc.). However, it is crucial that, whatever units are used, they are consistent across all link durations.
+    <br><br>
+    <b>Signalled vs. Unsignalled:</b>
+    <br>
+A choice alternative is treated by the calculator as signalled if both terminal link (TL) durations are non-zero and either the durations or the reinforcement probabilities differ between the TLs.
+    <br><br>
+    
+This definition assumes that differences in duration or reinforcement probability imply discriminability between the stimuli associated with each TL. For example, if one TL lasts 10 seconds and the other 20 seconds, and both have a reinforcement probability of 1, it is assumed that the organism can fully discriminate between them—e.g., the TLs may be visually distinct (such as different colours) and thus are recognisable from the moment of onset.
+    <br><br>
+    
+The SiGN model assumes that the (behavioural) function of terminal link stimuli remains fixed across the entire duration of the terminal link—that is, the probability of terminal reinforcement does not change partway through the terminal link. Procedures that depart from this assumption may not be appropriately handled by the model.
+    <br><br>
+    <b>Schedule Selection:</b>
+    <br>
+Setting the initial link schedules as 'FR' (fixed-ratio) is most suitable for cases involving an FR-1 schedule or when a single timer is employed in the initial links of long VI (variable-interval) schedules. This is because the 'FR' setting does not take into account the switching behaviour present with concurrent schedules using independent timers. For example, if a single timer is used for two concurrent VI 30 schedules, setting the initial link schedule as an FR is preferable because the time spent in the initial links is controlled by one timer, not two independent timers operating concurrently. However, if independent timers are used for each initial link, the model requires this setting to be VI .
+
+Note that the SiGN model does not directly compute predictions for ratio schedules. Instead, it represents the ratio as a duration with an individual reinforcement rate, rather than a common/shared one.
+    <br><br>
+    <b>Model Information:</b>
+    <br>
+    Additional details about the model can be found in Dunn et al. (2024).
+                    ")),
+      br(), br(),
+      tags$img(src = "diagram.svg", 
+               width = "50%", 
+               alt = "Diagram of concurrent-chains paradigm"),
+      br(), br(),
+      h4("References:"),
+      helpText(HTML("
+Dunn, R. M., Pisklak, J. M., McDevitt, M. A., & Spetch, M. L. (2024). Suboptimal choice: A review and quantification of the signal for good news (SiGN) model. <i>Psychological Review</i>. <i>131</i>(1), 58-78. <a href = 'https://doi.org/10.1037/rev0000416' target = '_blank'>https://doi.org/10.1037/rev0000416</a>
+")),
+      br(), br(),
+      h4("To Cite This Page:"),
+      helpText(HTML("
+This calculator uses the latest version of the <a href='https://jpisklak.github.io/SiGN/' target='_blank'>SiGN R package</a>. If you use it in your work, please cite the package as follows:
+
+Pisklak, J., Dunn, R., McDevitt, M., & Spetch, M. (2025). SiGN: Signal for Good News Model R Package (Version 0.0.0.9) [R package]. https://doi.org/10.5281/zenodo.15955616
+
+
+
+"))
+      
+  )
+  )
 )
-shinyApp(ui = u, server = s)
+
+server <- function(input, output, session) {
+  model_result <- reactive({
+    tryCatch(
+      {
+        pars <- choice_params(
+          profile = "zentall",
+          il_dur_a = parse_numeric_input(input$il_dur_a),
+          il_dur_b = parse_numeric_input(input$il_dur_b),
+          tl_dur_a1 = parse_numeric_input(input$tl_dur_a1),
+          tl_dur_a2 = parse_numeric_input(input$tl_dur_a2),
+          tl_dur_b1 = parse_numeric_input(input$tl_dur_b1),
+          tl_dur_b2 = parse_numeric_input(input$tl_dur_b2),
+          tl_p_a1 = parse_numeric_input(input$tl_p_a1),
+          tl_p_a2 = parse_numeric_input(input$tl_p_a2),
+          tl_p_b1 = parse_numeric_input(input$tl_p_b1),
+          tl_p_b2 = parse_numeric_input(input$tl_p_b2),
+          tr_p_a1 = parse_numeric_input(input$tr_p_a1),
+          tr_p_a2 = parse_numeric_input(input$tr_p_a2),
+          tr_p_b1 = parse_numeric_input(input$tr_p_b1),
+          tr_p_b2 = parse_numeric_input(input$tr_p_b2),
+          il_sched_a = parse_character_input(input$il_sched_a),
+          il_sched_b = parse_character_input(input$il_sched_b)
+        )
+        SiGN(pars)
+      },
+      error = function(e) {
+        e
+      }
+    )
+  })
+
+  output$choice_prop <- renderPrint({
+    result <- model_result()
+    if (inherits(result, "error")) {
+      cat("--------🐦 Error in model computation:--------\n\n", result$message)
+    } else {
+      result$cp <- round(result$cp, input$round_digits)
+      result$cp
+    }
+  })
+
+  output$rein_rate <- renderPrint({
+    result <- model_result()
+    if (inherits(result, "error")) {
+      cat("-------- 🐦 --------")
+    } else {
+      result$details[2:5] <- round(result$details[2:5], input$round_digits)
+      cat("--------Individual IL:--------\n", sep = ", ")
+      cat("Alternative A: \n", sep = ", ")
+      cat(result$details[[2]], sep = ", ")
+
+      cat("\n\nAlternative B: \n", sep = ", ")
+      cat(result$details[[3]], sep = ", ")
+
+      cat("\n\n--------Common Effective IL:--------\n", sep = ", ")
+      cat("Alternative A: \n", sep = ", ")
+      cat(result$details[[4]], sep = ", ")
+
+      cat("\n\nAlternative B: \n", sep = ", ")
+      cat(result$details[[5]], sep = ", ")
+    }
+  })
+
+  output$cond_rein <- renderPrint({
+    result <- model_result()
+    if (inherits(result, "error")) {
+      cat("-------- 🐦 --------")
+    } else {
+      result$details[7:8] <- round(result$details[7:8], input$round_digits)
+      cat("Alternative A: \n", sep = ", ")
+      cat(result$details[[7]], sep = ", ")
+
+      cat("\n\nAlternative B: \n", sep = ", ")
+      cat(result$details[[8]], sep = ", ")
+    }
+  })
+
+  output$add_details <- renderPrint({
+    result <- model_result()
+    if (inherits(result, "error")) {
+      cat("-------- 🐦 --------")
+    } else {
+      result$details[6:14] <- round(result$details[6:14], input$round_digits)
+
+      cat("Big T:\n")
+      cat(result$details[[6]], sep = ", ")
+
+      cat("\nAverage Delay Reduction on Alternative A:\n", sep = ", ")
+      cat(result$details[[9]], sep = ", ")
+      cat("\nAverage Delay Reduction on Alternative B:\n", sep = ", ")
+      cat(result$details[[10]], sep = ", ")
+      cat("\nBonus Delay Reduction on Alternative A:\n", sep = ", ")
+      cat(result$details[[11]], sep = ", ")
+      cat("\nBonus Delay Reduction on Alternative B:\n", sep = ", ")
+      cat(result$details[[12]], sep = ", ")
+      cat("\nBeta on Alternative A:\n", sep = ", ")
+      cat(result$details[[13]], sep = ", ")
+      cat("\nBeta on Alternative B:\n", sep = ", ")
+      cat(result$details[[14]], sep = ", ")
+      cat(
+        "\n\nAlternative A Signalled:\n ", result$details[[15]],
+        "\nAlternative B Signalled:\n ", result$details[[16]]
+      )
+    }
+  })
+
+  output$pkg_version <- renderPrint({
+    as.character(utils::packageVersion("SiGN"))
+  })
+}
+
+shinyApp(ui = ui, server = server)
