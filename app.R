@@ -113,7 +113,7 @@ ui <- fluidPage(
       <b>Schedule Selection:</b>
       <br>
       Setting the initial link schedules as 'FR' (fixed-ratio) is most 
-      suitable for cases involving an FR-1 schedule or when a single timer is 
+      suitable for cases involving an FR 1 schedule or when a single timer is 
       employed in the initial links of long VI (variable-interval) schedules. 
       This is because the 'FR' setting does not take into account the 
       switching behaviour present with concurrent schedules using independent 
@@ -192,7 +192,7 @@ server <- function(input, output, session) {
       cat("--------🐦 Error in model computation:--------\n\n", result$message)
     } else {
       result$cp <- round(result$cp, input$round_digits)
-      result$cp
+      cat(result$cp)
     }
   })
 
