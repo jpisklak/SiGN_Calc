@@ -33,6 +33,7 @@ ui <- fluidPage(
   ),
   sidebarLayout(
     sidebarPanel(
+      h5("Use commas to input multiple values\n(e.g., '1, 2, 3, 4')."),
       h3("Initial Link Durations"),
       textInput("il_dur_a", "A", "1"),
       textInput("il_dur_b", "B", "1"),
@@ -83,9 +84,7 @@ ui <- fluidPage(
       <h4>Using This Calculator:</h4>\n\n
       <p><b>Input Formatting:</b>
       <br>
-      To input multiple values, use commas to separate them (e.g., 1, 2, 3, 4).
-      <br><br>
-      Note that the SiGN model is temporally relative, meaning it allows 
+      The SiGN model is temporally relative, meaning it allows 
       initial and terminal link durations to be treated as any unit of time 
       (e.g., seconds, minutes, hours, etc.). However, it is crucial that, 
       whatever units are used, they are consistent across all link durations. 
@@ -192,7 +191,7 @@ server <- function(input, output, session) {
       cat("--------🐦 Error in model computation:--------\n\n", result$message)
     } else {
       result$cp <- round(result$cp, input$round_digits)
-      cat(result$cp)
+      cat(result$cp, sep = ", ")
     }
   })
 
