@@ -2,7 +2,7 @@
 An interactive tool for predicting choice in concurrent chained schedules of reinforcement using the SiGN (Signals for Good News) model.
 
 ## Overview
-This repository contains the source code for a web-based calculator that implements the SiGN (Signals for Good News) model of choice behaviour using the R package [SiGN](https://jpisklak.github.io/SiGN/). The calculator is designed to aid researchers and students in generating predictions for concurrent chained schedules of reinforcement.
+This repository contains the source code for a web-based calculator that implements the SiGN (Signals for Good News) model of choice behaviour using the R package [SiGN](https://sign-r.github.io/SiGN/). The calculator is designed to aid researchers and students in generating predictions for concurrent chained schedules of reinforcement.
 
 ## Usage
 The app is hosted on [shinyapps.io](https://www.shinyapps.io/) and can be accessed here: [https://jpisklak.shinyapps.io/SiGN_Calc/](https://jpisklak.shinyapps.io/SiGN_Calc/)

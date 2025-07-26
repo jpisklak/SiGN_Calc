@@ -1,6 +1,6 @@
 # Try loading SiGN package, install from GitHub if not already installed
 if (!requireNamespace("SiGN", quietly = TRUE)) {
-  devtools::install_github("jpisklak/SiGN")
+  devtools::install_github("https://github.com/SiGN-R/SiGN")
 }
 library(SiGN)
 
@@ -24,7 +24,7 @@ ui <- fluidPage(
   titlePanel(
     title = div(
       img(
-        src = "hex_sticker.png",
+        src = "hex_sticker.svg",
         width = "7%",
         style = "margin-right: 15px;"
       ),
@@ -272,7 +272,7 @@ server <- function(input, output, session) {
 
     HTML(paste0(
       "This calculator uses version <b>", pkg_ver, "</b> of the ",
-      "<a href='https://jpisklak.github.io/SiGN/' target='_blank'>SiGN R ",
+      "<a href='https://sign-r.github.io/SiGN/' target='_blank'>SiGN R ",
       "package</a>. If you use it in your work, please cite the package as ",
       "follows:",
       "<br><br>",
@@ -287,7 +287,7 @@ server <- function(input, output, session) {
         author  = {Jeffrey Pisklak and Roger Dunn and Margaret McDevitt and Marcia Spetch},
         year    = {", year, "},
         note    = {Version ", pkg_ver, "},
-        url     = {https://github.com/jpisklak/SiGN}
+        url     = {https://sign-r.github.io/SiGN/}
         doi     = {10.5281/zenodo.15955616}
       }",
       "</pre>"
